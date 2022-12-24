@@ -6,8 +6,8 @@ name: update
 on:
   # run this task every minute 45 of every hr of every day
   # preload usually happens at minute 45? but actions fires 5mins later
-  schedule:
-  - cron: '45 * * * *'
+  # schedule:
+  # - cron: '45 * * * *'
 
   # allow this task to be run manually from Actions tab
   workflow_dispatch:
@@ -21,10 +21,13 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup Python [3.x]
-        if: ${{ steps.check_for_updates.outputs.success == 'true' }}
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
+      
+      - name: Check Update
+        id: check_for_update
+        run: python download.py
 
       # btw for some reason installing UnityPack here causes issues
       # it's kind of a pain to debug sooooo UnityPack is provided in vendor/UnityPack
@@ -32,6 +35,7 @@ jobs:
       - name: Install Python dependencies
         if: ${{ steps.check_for_updates.outputs.success == 'true' }}
         run: |
+          pip install requests
           pip install lz4
           pip install UnityPy
           pip install brotli
